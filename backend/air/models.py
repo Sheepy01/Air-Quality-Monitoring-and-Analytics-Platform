@@ -58,6 +58,9 @@ class AirQualityData(models.Model):
     nh3 = models.FloatField(null=True, blank=True)
 
     aqi = models.FloatField(null=True, blank=True)
+    aqi_category = models.CharField(max_length=50, null=True, blank=True)
+    aqi_color = models.CharField(max_length=20, null=True, blank=True)
+    dominant_pollutant = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         unique_together = ("station", "date")

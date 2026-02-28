@@ -85,3 +85,19 @@ def calculate_overall_aqi(record):
 
     #  returning dominant pollutant also
     return final_aqi, category, color, dominant_pollutant
+
+def calculate_aqi_from_values(pm25=None, pm10=None, no2=None, so2=None, o3=None, co=None, nh3=None):
+
+    class TempRecord:
+        pass
+
+    temp = TempRecord()
+    temp.pm25 = pm25
+    temp.pm10 = pm10
+    temp.no2 = no2
+    temp.so2 = so2
+    temp.o3 = o3
+    temp.co = co
+    temp.nh3 = nh3
+
+    return calculate_overall_aqi(temp)

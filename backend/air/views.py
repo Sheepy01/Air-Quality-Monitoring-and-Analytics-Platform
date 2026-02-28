@@ -161,38 +161,39 @@ def aqi_summary(request):
 
     year = request.GET.get("year")
 
-    queryset = AirQualityData.objects.select_related(
-        "station"
-    ).only(
+    queryset = AirQualityData.objects.select_related("station").only(
         "date",
-        "pm25","pm10","no2",
-        "station__name"
+        "station__name",
+        "aqi",
+        "aqi_category",
+        "dominant_pollutant"
     )
 
-    # optional filter
     if year:
         queryset = queryset.filter(year=year)
 
-    results = []
+    results = list(
+        queryset[:50].values(
+            "date",
+            "station__name",
+            "aqi",
+            "aqi_category",
+            "dominant_pollutant"
+        )
+    )
 
-    # testing ke liye limit
-    for record in queryset[:50]:
+    formatted = [
+        {
+            "date": r["date"],
+            "station": r["station__name"],
+            "aqi": r["aqi"],
+            "category": r["aqi_category"],
+            "dominant_pollutant": r["dominant_pollutant"]
+        }
+        for r in results
+    ]
 
-        aqi, category, color, dominant = calculate_overall_aqi(record)
-
-        results.append({
-            "date": record.date,
-            "station": record.station.name,
-            "pm25": record.pm25,
-            "pm10": record.pm10,
-            "no2": record.no2,
-            "aqi": aqi,
-            "category": category,
-            "color": color,
-            "dominant_pollutant": dominant
-        })
-
-    return Response(results)
+    return Response(formatted)
 
 #   --------- Dashboard Overview API ----------
 @cache_page(60 * 10)
@@ -225,7 +226,7 @@ def dashboard_overview(request):
 
     # ---------- YEARLY TREND ----------
     yearly_data = list(
-        AirQualityData.objects.values("year")
+        queryset.values("year")
         .annotate(avg_pm25=Avg("pm25"))
         .order_by("year")
     )
@@ -240,17 +241,15 @@ def dashboard_overview(request):
     # ---------- AQI SAMPLE ----------
     aqi_sample = []
 
-    for record in queryset[:20]:
-        aqi, category, color, dominant = calculate_overall_aqi(record)
-
-        aqi_sample.append({
-            "date": record.date,
-            "station": record.station.name,
-            "aqi": aqi,
-            "category": category,
-            "color": color,
-            "dominant_pollutant": dominant
-        })
+    aqi_sample = list(
+        queryset[:20].values(
+            "date",
+            "station__name",
+            "aqi",
+            "aqi_category",
+            "dominant_pollutant"
+        )
+    )
 
     return Response({
         "summary": summary,

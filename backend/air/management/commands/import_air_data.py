@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from air.models import Country, State, District, Station, AirQualityData
 import pandas as pd
 import os
+from air.aqi_utils import calculate_aqi_from_values
 
 
 # ================= PATH =================
@@ -109,19 +110,42 @@ class Command(BaseCommand):
                             if date is None:
                                 continue
 
-                            AirQualityData.objects.get_or_create(
+                            pm25 = get_col(row, "pm25")
+                            pm10 = get_col(row, "pm10")
+                            no2 = get_col(row, "no2")
+                            so2 = get_col(row, "so2")
+                            o3 = get_col(row, "ozone", "o3")
+                            co = get_col(row, "co")
+                            nh3 = get_col(row, "nh3")
+
+                            aqi, category, color, dominant = calculate_aqi_from_values(
+                                pm25=pm25,
+                                pm10=pm10,
+                                no2=no2,
+                                so2=so2,
+                                o3=o3,
+                                co=co,
+                                nh3=nh3
+                            )
+
+                            AirQualityData.objects.update_or_create(
                                 station=station,
                                 date=date,
-                                year=date.year,
-                                month=date.month,
-                                day=date.day,
-                                pm25=get_col(row, "pm25"),
-                                pm10=get_col(row, "pm10"),
-                                no2=get_col(row, "no2"),
-                                so2=get_col(row, "so2"),
-                                o3=get_col(row, "ozone", "o3"),
-                                co=get_col(row, "co"),
-                                nh3=get_col(row, "nh3"),
+                                defaults={
+                                    "year": date.year,
+                                    "month": date.month,
+                                    "day": date.day,
+                                    "pm25": pm25,
+                                    "pm10": pm10,
+                                    "no2": no2,
+                                    "so2": so2,
+                                    "o3": o3,
+                                    "co": co,
+                                    "nh3": nh3,
+                                    "aqi": aqi,
+                                    "aqi_category": category,
+                                    "dominant_pollutant": dominant,
+                                }
                             )
 
                         except Exception as e:
