@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.db.models import Avg, Count, Q
 from .models import AirQualityData
 from .aqi_utils import calculate_overall_aqi
+from django.views.decorators.cache import cache_page
 
 from .chat_engine import (
     extract_year,
@@ -194,6 +195,7 @@ def aqi_summary(request):
     return Response(results)
 
 #   --------- Dashboard Overview API ----------
+@cache_page(60 * 10)
 @api_view(["GET"])
 def dashboard_overview(request):
 

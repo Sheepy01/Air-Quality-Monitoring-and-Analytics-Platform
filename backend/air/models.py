@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 
 class Country(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -42,11 +42,11 @@ class Station(models.Model):
 
 
 class AirQualityData(models.Model):
-    station = models.ForeignKey(Station, on_delete=models.CASCADE)
+    station = models.ForeignKey(Station, on_delete=models.CASCADE, db_index=True)
 
-    date = models.DateField()
-    year = models.IntegerField()
-    month = models.IntegerField()
+    date = models.DateField(db_index=True)
+    year = models.IntegerField(db_index=True)
+    month = models.IntegerField(db_index=True)
     day = models.IntegerField()
 
     pm25 = models.FloatField(null=True, blank=True)
@@ -61,6 +61,21 @@ class AirQualityData(models.Model):
 
     class Meta:
         unique_together = ("station", "date")
+        indexes = [
+            models.Index(fields=["year", "month"]),
+            models.Index(fields=["station", "year"]),
+            models.Index(fields=["station", "date"]),
+        ]
 
     def __str__(self):
         return f"{self.station} - {self.date}"
+    
+class ExportLog(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    export_type = models.CharField(max_length=100)
+    filters_used = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
