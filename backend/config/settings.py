@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,7 +81,7 @@ DATABASES = {
         'NAME': 'air_quality_db',
         'USER': 'root',
         'PASSWORD': 'Sheepy01@Mysql',
-        'HOST': 'localhost',
+        'HOST': os.getenv("DB_HOST", "127.0.0.1"),
         'PORT': '3306',
     }
 }
@@ -126,7 +127,10 @@ STATIC_URL = 'static/'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": f"redis://{os.getenv('REDIS_HOST', '127.0.0.1')}:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 

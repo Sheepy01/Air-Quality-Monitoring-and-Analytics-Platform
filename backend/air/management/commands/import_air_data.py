@@ -6,7 +6,7 @@ from air.aqi_utils import calculate_aqi_from_values
 
 
 # ================= PATH =================
-BASE_PATH = r"E:\Air_Quality_Monitoring_Data"
+BASE_PATH = r"F:\\Backup\\ADRI\\Projects\\Air Quality Monitoring and Analytics Platform\\Data\\Air_Quality_Monitoring_Data"
 
 
 # ================= FLEXIBLE COLUMN FINDER =================
