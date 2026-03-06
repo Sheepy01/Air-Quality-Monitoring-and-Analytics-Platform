@@ -1,9 +1,10 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Avg, Count, Q
 from .models import AirQualityData
 from .aqi_utils import calculate_overall_aqi
 from django.views.decorators.cache import cache_page
+from rest_framework.permissions import IsAuthenticated
 
 from .chat_engine import (
     extract_year,
@@ -198,6 +199,7 @@ def aqi_summary(request):
 #   --------- Dashboard Overview API ----------
 @cache_page(60 * 10)
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def dashboard_overview(request):
 
     year = request.GET.get("year")

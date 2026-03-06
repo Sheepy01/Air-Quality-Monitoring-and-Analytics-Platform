@@ -1,10 +1,10 @@
 import { Routes, Route } from 'react-router-dom'
 import { ROUTES } from './config'
-import { ProtectedRoute } from '@/components/shared/ProtectedRoute'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { MainLayout } from '@/components/layout/MainLayout'
-
-// Pages
 import { LandingPage } from '@/pages/LandingPage'
+import { LoginPage } from '@/pages/LoginPage'
+import { RegisterPage } from '@/pages/RegisterPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
@@ -13,6 +13,8 @@ export function AppRouter() {
     <Routes>
       {/* Public Routes */}
       <Route path={ROUTES.HOME} element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       
       {/* Protected Routes with MainLayout */}
       <Route element={<ProtectedRoute />}>
@@ -24,7 +26,7 @@ export function AppRouter() {
           <Route path={ROUTES.MAP} element={<div>Map Page (Coming Soon)</div>} />
           
           {/* Admin Routes */}
-          <Route element={<ProtectedRoute requiredRole="admin" />}>
+          <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.ADMIN} element={<div>Admin Page (Coming Soon)</div>} />
             <Route path={ROUTES.EXPORT} element={<div>Export Page (Coming Soon)</div>} />
           </Route>
